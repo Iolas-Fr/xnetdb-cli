@@ -1,0 +1,6 @@
+[target.x86_64-pc-windows-gnu]
+# Explicit MinGW-w64 linker: a plain `gcc` may resolve to an NI Linux RT
+# cross-compiler on the system PATH. See docs/development-environment.md.
+linker = "x86_64-w64-mingw32-gcc"
+# No MinGW runtime DLLs in the final executable.
+rustflags = ["-C", "target-feature=+crt-static"]
