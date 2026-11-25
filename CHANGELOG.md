@@ -15,3 +15,5 @@ First release.
 - Standalone Windows x64 executable; `nixnet.dll` is loaded at run time, with a dedicated exit code when the driver is missing.
 - Windows file properties: company, product, version and copyright.
 - Releases ship `LICENSE`, `NOTICE`, `THIRD-PARTY-LICENSES.txt` and a SHA-256 checksum with the executable.
+
+[0.1.0]: https://github.com/Iolas-Fr/xnetdb-cli/releases/tag/v0.1.0

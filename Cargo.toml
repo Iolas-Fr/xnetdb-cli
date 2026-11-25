@@ -8,6 +8,7 @@ description = "Command-line tool to manage NI-XNET database aliases"
 authors = ["IOLAS"]
 license = "Apache-2.0"
 readme = "README.md"
+repository = "https://github.com/Iolas-Fr/xnetdb-cli"
 # Distributed as a Windows executable through GitHub releases, not on crates.io.
 publish = false
 
