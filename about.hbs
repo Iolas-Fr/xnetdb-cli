@@ -1,0 +1,23 @@
+THIRD-PARTY LICENSES
+====================
+
+xnetdb-cli.exe includes the following open source components.
+Each license text below applies to the crates listed with it.
+
+The executable also includes the Rust standard library
+(https://github.com/rust-lang/rust), dual licensed under MIT or Apache-2.0.
+It is used here under the Apache License 2.0, whose text is in the LICENSE
+file distributed with xnetdb-cli.exe.
+
+{{#each licenses}}
+--------------------------------------------------------------------------------
+{{name}} ({{id}})
+
+Used by:
+{{#each used_by}}
+  - {{crate.name}} {{crate.version}}{{#if crate.repository}} ({{crate.repository}}){{/if}}
+{{/each}}
+
+{{text}}
+
+{{/each}}
