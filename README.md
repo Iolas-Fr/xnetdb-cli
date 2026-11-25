@@ -3,6 +3,25 @@
 `xnetdb-cli` is a standalone Windows command-line tool that creates, updates, lists and removes NI-XNET database aliases (FIBEX, DBC, LDF, ...) without the NI-XNET Database Editor.
 Intended for deployment scripts, e.g. to make a FIBEX database available to VeriStand on a new machine.
 
+## Installation
+
+Download `xnetdb-cli.exe` from the [latest release](https://github.com/Iolas-Fr/xnetdb-cli/releases/latest) and check it against the published checksum:
+
+```powershell
+(Get-FileHash .\xnetdb-cli.exe -Algorithm SHA256).Hash
+Get-Content .\xnetdb-cli.exe.sha256
+```
+
+The executable needs no installation: place it next to the deployment script or in a directory on the `PATH`.
+When redistributing it, keep `LICENSE`, `NOTICE` and `THIRD-PARTY-LICENSES.txt` with it.
+
+Example in a PowerShell deployment script:
+
+```powershell
+.\xnetdb-cli.exe add LoopTest_8CAN "$PSScriptRoot\LoopTest_8CAN.xml"
+if ($LASTEXITCODE -ne 0) { throw "NI-XNET alias registration failed ($LASTEXITCODE)" }
+```
+
 ## Usage
 
 ```
@@ -32,6 +51,8 @@ Validation is left to NI-XNET, which reports explicit errors. Observed behaviour
 - Removing an alias that does not exist is an error.
 
 Aliases survive NI-XNET upgrades but are lost when the driver is uninstalled: run `xnetdb-cli add` again after a clean reinstall.
+
+API details, status codes and references: [docs/nixnet-api.md](docs/nixnet-api.md).
 
 ## Runtime requirements
 
@@ -95,17 +116,22 @@ cargo about generate --locked --fail about.hbs -o THIRD-PARTY-LICENSES.txt
 
 To release, following gitflow:
 
-1. Create `release/x.y.z` from `develop`, set `version = "x.y.z"` in `Cargo.toml`, replace `Unreleased` with the release date in the version's heading of [CHANGELOG.md](CHANGELOG.md), and run the acceptance test (see [Tests](#tests)).
-2. Merge it into `main` and back into `develop`.
-3. Tag `main` and push the tag:
+1. Create the release branch from `develop` (`release/x.y.z`; Fork names it `release/vx.y.z` with a `v` tag prefix, which is fine).
+2. On that branch, set `version = "x.y.z"` in `Cargo.toml` if needed, and replace `Unreleased` with the release date (`YYYY-MM-DD`) in the version's heading of [CHANGELOG.md](CHANGELOG.md).
+3. Push the branch and run the workflow manually on it; check the artifact (5 files).
+4. Run the acceptance test with that executable (see [Tests](#tests)).
+5. Finish the release: merge into `main` and back into `develop`, tag `main` with `vx.y.z`, and push the branches and the tag.
+   The tag must start with `v`: in Fork, set the gitflow version tag prefix to `v`. Without Fork:
 
    ```powershell
    git tag -a vx.y.z -m "xnetdb-cli x.y.z"
-   git push origin vx.y.z
+   git push origin main develop vx.y.z
    ```
 
 Branching follows gitflow: `main` (releases), `develop` (integration), `feature/*`, `release/*`, `hotfix/*`.
 Commit messages and documentation are written in English.
+
+Open points and deferred features: [docs/backlog.md](docs/backlog.md).
 
 ## License
 
