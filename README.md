@@ -47,5 +47,25 @@ cargo test
 cargo build --release
 ```
 
+### Tests
+
+- **Unit tests** (`cargo test`) cover the tool's own logic and run anywhere.
+- **NI-XNET integration tests** ([tests/nixnet_driver.rs](tests/nixnet_driver.rs)) run the built `xnetdb` against the real driver.
+  They are ignored by default because they need NI-XNET and modify the machine's alias list:
+
+  ```powershell
+  cargo test -- --ignored
+  ```
+
+Why the integration tests exist: `xnetdb` deliberately leaves validation to NI-XNET, so its correctness rests on the driver behaviour listed under [NI-XNET behaviour](#ni-xnet-behaviour), which was observed by hand rather than documented by NI.
+The integration tests replay those observations, so they serve as evidence for the README and detect any behaviour change after a driver update.
+Run them after changing the code that calls NI-XNET, and after upgrading NI-XNET.
+
+They use temporary `xnetdb-it-*` aliases pointing at copies of the FIBEX example installed with NI-XNET, and remove them afterwards.
+Set `XNETDB_TEST_DB` to another valid database file if the example is not installed.
+Assertions rely on exit codes and NI-XNET status codes, not on the localised messages.
+
+These tests do not replace the acceptance test before a release: register a real database with `xnetdb add`, check it under *File → Manage Aliases* in the NI-XNET Database Editor, and check that a VeriStand deployment finds it.
+
 Branching follows gitflow: `main` (releases), `develop` (integration), `feature/*`, `release/*`, `hotfix/*`.
 Commit messages and documentation are written in English.
