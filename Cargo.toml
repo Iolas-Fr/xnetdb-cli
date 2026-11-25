@@ -1,0 +1,25 @@
+[package]
+name = "xnetdb-cli"
+version = "0.1.0"
+edition = "2024"
+# Minimum supported Rust version, set by libloading 0.9.
+rust-version = "1.88"
+description = "Command-line tool to manage NI-XNET database aliases"
+authors = ["IOLAS"]
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/Iolas-Fr/xnetdb-cli"
+# Distributed as a Windows executable through GitHub releases, not on crates.io.
+publish = false
+
+[dependencies]
+clap = { version = "4.6.10", features = ["derive"] }
+libloading = "0.9.1"
+
+[features]
+# Enables tests/nixnet_driver.rs, which creates and removes temporary
+# aliases in this machine's NI-XNET alias list. Requires the NI-XNET driver.
+modify-system-aliases = []
+
+[build-dependencies]
+winresource = "0.1.34"
