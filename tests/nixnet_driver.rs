@@ -18,12 +18,16 @@
 //!
 //! # Running
 //!
-//! They need the NI-XNET driver and modify the machine's alias list, so they
-//! are `#[ignore]`d and must be requested explicitly:
+//! These tests modify the machine's NI-XNET alias list, which is shared with
+//! every NI-XNET application on the machine (VeriStand included). They are
+//! therefore only compiled when explicitly requested:
 //!
 //! ```text
-//! cargo test -- --ignored
+//! cargo test --features modify-system-aliases
 //! ```
+//!
+//! With the feature enabled, a missing NI-XNET driver fails the tests; they
+//! are never skipped silently.
 //!
 //! Each test uses its own `xnetdb-it-*` aliases pointing at temporary copies
 //! of a valid database, and removes them afterwards, even on failure.
@@ -32,6 +36,8 @@
 //!
 //! NI-XNET messages are localised, so assertions use the exit code and the
 //! hexadecimal status code, never the message text.
+
+#![cfg(feature = "modify-system-aliases")]
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
@@ -62,6 +68,12 @@ struct Fixture {
 impl Fixture {
     fn new(name: &str) -> Self {
         let lock = DRIVER.lock().unwrap_or_else(|e| e.into_inner());
+        let probe = xnetdb(&["list"]);
+        assert!(
+            probe.status.success(),
+            "NI-XNET driver required by feature modify-system-aliases: {}",
+            stderr(&probe)
+        );
         let dir = env::temp_dir().join(format!("xnetdb-it-{}-{name}", std::process::id()));
         fs::create_dir_all(&dir).expect("create temp dir");
         Self {
@@ -156,7 +168,6 @@ fn registered_name(alias: &str) -> Option<String> {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn add_registers_alias_and_remove_deletes_it() {
     let mut fx = Fixture::new("add");
     let alias = fx.alias("add");
@@ -171,7 +182,6 @@ fn add_registers_alias_and_remove_deletes_it() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn add_is_idempotent() {
     let mut fx = Fixture::new("idempotent");
     let alias = fx.alias("idempotent");
@@ -183,7 +193,6 @@ fn add_is_idempotent() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn add_replaces_file_of_existing_alias() {
     let mut fx = Fixture::new("replace");
     let alias = fx.alias("replace");
@@ -196,7 +205,6 @@ fn add_replaces_file_of_existing_alias() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn no_replace_refuses_existing_alias() {
     let mut fx = Fixture::new("no-replace");
     let alias = fx.alias("no-replace");
@@ -210,7 +218,6 @@ fn no_replace_refuses_existing_alias() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn no_replace_is_case_insensitive() {
     let mut fx = Fixture::new("no-replace-case");
     let alias = fx.alias("no-replace-case");
@@ -224,7 +231,6 @@ fn no_replace_is_case_insensitive() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn alias_names_are_case_insensitive() {
     let mut fx = Fixture::new("case");
     let alias = fx.alias("case");
@@ -241,7 +247,6 @@ fn alias_names_are_case_insensitive() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn file_can_be_assigned_to_one_alias_only() {
     let mut fx = Fixture::new("one-file");
     let first = fx.alias("one-file-a");
@@ -257,7 +262,6 @@ fn file_can_be_assigned_to_one_alias_only() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn missing_file_is_rejected() {
     let mut fx = Fixture::new("missing");
     let alias = fx.alias("missing");
@@ -271,7 +275,6 @@ fn missing_file_is_rejected() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn non_database_file_is_rejected() {
     let mut fx = Fixture::new("invalid");
     let alias = fx.alias("invalid");
@@ -285,7 +288,6 @@ fn non_database_file_is_rejected() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn comma_in_alias_is_rejected() {
     let mut fx = Fixture::new("comma-alias");
     let db = fx.database("db.xml");
@@ -298,7 +300,6 @@ fn comma_in_alias_is_rejected() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn comma_in_path_is_rejected() {
     let mut fx = Fixture::new("comma-path");
     let alias = fx.alias("comma-path");
@@ -311,7 +312,6 @@ fn comma_in_path_is_rejected() {
 }
 
 #[test]
-#[ignore = "needs the NI-XNET driver; modifies the alias list"]
 fn removing_unknown_alias_is_an_error() {
     let mut fx = Fixture::new("unknown");
     let alias = fx.alias("unknown");

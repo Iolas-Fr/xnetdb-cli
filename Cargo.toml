@@ -6,3 +6,8 @@ edition = "2024"
 [dependencies]
 clap = { version = "4.6.10", features = ["derive"] }
 libloading = "0.9.1"
+
+[features]
+# Enables tests/nixnet_driver.rs, which creates and removes temporary
+# aliases in this machine's NI-XNET alias list. Requires the NI-XNET driver.
+modify-system-aliases = []

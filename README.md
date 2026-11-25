@@ -49,13 +49,22 @@ cargo build --release
 
 ### Tests
 
-- **Unit tests** (`cargo test`) cover the tool's own logic and run anywhere.
-- **NI-XNET integration tests** ([tests/nixnet_driver.rs](tests/nixnet_driver.rs)) run the built `xnetdb` against the real driver.
-  They are ignored by default because they need NI-XNET and modify the machine's alias list:
+- **Unit tests** cover the tool's own logic. They run anywhere, with or without NI-XNET:
 
   ```powershell
-  cargo test -- --ignored
+  cargo test
   ```
+
+- **NI-XNET integration tests** ([tests/nixnet_driver.rs](tests/nixnet_driver.rs)) run the built `xnetdb` against the real driver.
+  They **modify this machine's NI-XNET alias list**, which every NI-XNET application on the machine shares, VeriStand included.
+  They are therefore only compiled when the `modify-system-aliases` feature is requested explicitly:
+
+  ```powershell
+  cargo test --features modify-system-aliases
+  ```
+
+  Without NI-XNET, do not enable the feature: the tests would fail, by design, rather than be skipped silently.
+  Avoid running them on a production machine.
 
 Why the integration tests exist: `xnetdb` deliberately leaves validation to NI-XNET, so its correctness rests on the driver behaviour listed under [NI-XNET behaviour](#ni-xnet-behaviour), which was observed by hand rather than documented by NI.
 The integration tests replay those observations, so they serve as evidence for the README and detect any behaviour change after a driver update.
