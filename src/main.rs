@@ -1,4 +1,4 @@
-//! xnetdb: manage NI-XNET database aliases from the command line.
+//! xnetdb-cli: manage NI-XNET database aliases from the command line.
 
 mod nixnet;
 

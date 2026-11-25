@@ -195,7 +195,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "xnetdb"
+name = "xnetdb-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
