@@ -1,7 +1,9 @@
 [package]
-name = "xnetdb"
+name = "xnetdb-cli"
 version = "0.1.0"
 edition = "2024"
+description = "Command-line tool to manage NI-XNET database aliases"
+license = "Apache-2.0"
 
 [dependencies]
 clap = { version = "4.6.10", features = ["derive"] }
