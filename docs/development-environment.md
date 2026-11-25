@@ -88,8 +88,10 @@ The release binary must depend on no MinGW DLL (`libgcc_s_seh-1.dll`, `libwinpth
 Check the actual imports after a build:
 
 ```powershell
-objdump -p target\release\<binary>.exe | Select-String 'DLL Name'
+C:\msys64\mingw64\bin\objdump.exe -p target\release\<binary>.exe | Select-String 'DLL Name'
 ```
 
-Only Windows system DLLs are acceptable.
+Use the full path: the NI cross-toolchains also put an `objdump` on the system `PATH`.
+
+Only Windows system DLLs are acceptable (`KERNEL32.dll`, `msvcrt.dll`, `ntdll.dll`, `USERENV.dll`, `WS2_32.dll`, `bcryptprimitives.dll`, `api-ms-win-*` for a Rust std binary).
 `nixnet.dll` must **not** appear: it is loaded at run time with `libloading`, so a missing driver yields a clear error message instead of a loader failure.
