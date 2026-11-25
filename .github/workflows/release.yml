@@ -59,11 +59,17 @@ jobs:
             exit 1
           fi
 
-      # Apache-2.0 section 4: LICENSE and NOTICE travel with the binary.
+      - name: Generate third-party licenses
+        run: |
+          cargo install cargo-about --locked --version 0.9.3 --features cli
+          cargo about generate --locked --fail about.hbs -o THIRD-PARTY-LICENSES.txt
+
+      # Licenses travel with the binary: Apache-2.0 section 4 for LICENSE and
+      # NOTICE, dependency licenses for THIRD-PARTY-LICENSES.txt.
       - name: Stage distribution files
         run: |
           mkdir dist
-          cp "$EXE" LICENSE NOTICE dist/
+          cp "$EXE" LICENSE NOTICE THIRD-PARTY-LICENSES.txt dist/
           cd dist
           sha256sum xnetdb-cli.exe > xnetdb-cli.exe.sha256
           cat xnetdb-cli.exe.sha256
@@ -93,4 +99,4 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --verify-tag \
             --generate-notes \
-            xnetdb-cli.exe xnetdb-cli.exe.sha256 LICENSE NOTICE
+            xnetdb-cli.exe xnetdb-cli.exe.sha256 LICENSE NOTICE THIRD-PARTY-LICENSES.txt

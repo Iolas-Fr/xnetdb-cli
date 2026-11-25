@@ -10,7 +10,8 @@ Visual Studio, the MSVC toolchain and the Windows SDK are **not** used and must 
 | Git for Windows | latest | Version control (gitflow: `main`, `develop`, `feature/*`) |
 | MSYS2 | latest, installed in `C:\msys64` | Provides MinGW-w64 |
 | MinGW-w64 (MINGW64 env) | `mingw-w64-x86_64-toolchain` | Linker (`x86_64-w64-mingw32-gcc`), `objdump`, `dlltool` |
-| rustup / Rust stable | host `x86_64-pc-windows-gnu` | Compiler and Cargo |
+| rustup / Rust stable | host `x86_64-pc-windows-gnu`, 1.88 or later | Compiler and Cargo |
+| cargo-about (optional) | 0.9.3 | Third-party license file, see the README |
 | NI-XNET driver | any recent | Provides `C:\Windows\System32\nixnet.dll` (64-bit), needed at run time only |
 
 Stay 64-bit throughout: the `nixnet.dll` in `System32` is 64-bit.
@@ -80,6 +81,15 @@ The system `PATH` comes before the user `PATH`, so a plain `gcc` resolves to an 
 
 The repository avoids this: [`.cargo/config.toml`](../.cargo/config.toml) sets the linker explicitly to `x86_64-w64-mingw32-gcc`, which only MinGW-w64 provides.
 Do not remove that setting.
+For the same reason, [`build.rs`](../build.rs) takes `windres` and `ar` from the MinGW-w64 directory to embed the Windows version information (the NI directories also provide an `ar`).
+
+`cargo install` ignores the project configuration.
+Installing a tool that compiles C code (e.g. `cargo-about`, through `ring`) therefore needs the compiler set explicitly:
+
+```powershell
+$env:CC = 'x86_64-w64-mingw32-gcc'; $env:AR = 'x86_64-w64-mingw32-gcc-ar'
+cargo install cargo-about --locked --version 0.9.3 --features cli
+```
 
 ## Standalone binary
 

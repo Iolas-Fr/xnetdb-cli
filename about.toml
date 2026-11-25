@@ -1,0 +1,22 @@
+# cargo-about configuration: licenses of the crates compiled into
+# xnetdb-cli.exe, shipped as THIRD-PARTY-LICENSES.txt with each release.
+# Generate with:
+#   cargo about generate --locked --fail about.hbs -o THIRD-PARTY-LICENSES.txt
+
+# Only the Windows executable is distributed.
+targets = ["x86_64-pc-windows-gnu"]
+
+# Build and dev dependencies are not part of the executable.
+ignore-build-dependencies = true
+ignore-dev-dependencies = true
+
+# Skip xnetdb-cli itself (publish = false): its license is LICENSE/NOTICE.
+private = { ignore = true }
+
+# Licenses accepted for dependencies; generation fails on anything else.
+accepted = [
+    "Apache-2.0",
+    "MIT",
+    "ISC",
+    "Unicode-3.0",
+]
