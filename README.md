@@ -76,6 +76,25 @@ Assertions rely on exit codes and NI-XNET status codes, not on the localised mes
 
 These tests do not replace the acceptance test before a release: register a real database with `xnetdb-cli add`, check it under *File → Manage Aliases* in the NI-XNET Database Editor, and check that a VeriStand deployment finds it.
 
+### Continuous integration and releases
+
+[.github/workflows/release.yml](.github/workflows/release.yml) cross-compiles `xnetdb-cli.exe` on an `ubuntu-latest` runner (MinGW-w64, target `x86_64-pc-windows-gnu`), runs the unit tests and checks that the executable depends on no MinGW runtime DLL.
+
+- **Manual run** (*Actions → Release → Run workflow*, any branch): build only. The executable, its SHA-256 checksum, `LICENSE` and `NOTICE` are attached to the run as the `xnetdb-cli` artifact.
+- **Version tag** `v*`: build, then publish a GitHub release with the same files and notes generated from the commits.
+  The tag must match the version in `Cargo.toml`, otherwise the workflow fails.
+
+To release, following gitflow:
+
+1. Create `release/x.y.z` from `develop`, set `version = "x.y.z"` in `Cargo.toml`, and run the acceptance test (see [Tests](#tests)).
+2. Merge it into `main` and back into `develop`.
+3. Tag `main` and push the tag:
+
+   ```powershell
+   git tag -a vx.y.z -m "xnetdb-cli x.y.z"
+   git push origin vx.y.z
+   ```
+
 Branching follows gitflow: `main` (releases), `develop` (integration), `feature/*`, `release/*`, `hotfix/*`.
 Commit messages and documentation are written in English.
 
